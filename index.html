@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git Workshop — Notre Équipe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #161922;
+      --border:    #2a2f3d;
+      --accent:    #f0522a;
+      --accent2:   #f5c842;
+      --text:      #e8eaf0;
+      --muted:     #6b7280;
+      --radius:    12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────────── */
+    header {
+      position: relative;
+      padding: 60px 40px 50px;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(240,82,42,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 10% 80%, rgba(245,200,66,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(240,82,42,.12);
+      border: 1px solid rgba(240,82,42,.3);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: .75rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+      letter-spacing: .04em;
+    }
+
+    .header-badge::before { content: '⬡'; font-size: 1em; }
+
+    header h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p.subtitle {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 400;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ── GIT BRANCH BADGE ────────────────────────────── */
+    .branch-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      color: var(--accent2);
+      background: rgba(245,200,66,.08);
+      border: 1px solid rgba(245,200,66,.2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      margin-top: 20px;
+    }
+    .branch-tag::before { content: '⎇'; }
+
+    /* ── MAIN LAYOUT ─────────────────────────────────── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── TEAM GRID ───────────────────────────────────── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 70px;
+    }
+
+    .member-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+      display: block;
+    }
+
+    .member-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(240,82,42,.07), transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .member-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(240,82,42,.15);
+    }
+    .member-card:hover::before { opacity: 1; }
+
+    .member-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #c0331a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      transition: border-color .2s;
+    }
+
+    .member-card:hover .member-avatar {
+      border-color: var(--accent);
+    }
+
+    .member-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    /* Couleurs variées par carte (fallback si pas d'image) */
+    .member-card:nth-child(2) .member-avatar { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .member-card:nth-child(3) .member-avatar { background: linear-gradient(135deg, #10b981, #047857); }
+    .member-card:nth-child(4) .member-avatar { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    .member-card:nth-child(5) .member-avatar { background: linear-gradient(135deg, var(--accent2), #d97706); }
+
+    .member-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .member-role {
+      font-family: 'Space Mono', monospace;
+      font-size: .68rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .member-arrow {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1.1rem;
+      color: var(--border);
+      transition: color .2s, transform .2s;
+    }
+    .member-card:hover .member-arrow {
+      color: var(--accent);
+      transform: translate(3px, -3px);
+    }
+
+    /* Carte "placeholder" pour les membres à ajouter */
+    .member-card.placeholder {
+      border-style: dashed;
+      opacity: .45;
+      pointer-events: none;
+    }
+    .member-card.placeholder .member-avatar {
+      background: var(--border);
+    }
+
+    /* ── ABOUT SECTION ───────────────────────────────── */
+    .about-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+    }
+
+    .about-box h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .about-box p {
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: .97rem;
+      max-width: 650px;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    .git-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: .72rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 14px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .git-badge span { color: var(--accent2); }
+
+    /* ── ANIMATIONS ──────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    header      { animation: fadeUp .5s ease both; }
+    main        { animation: fadeUp .5s .1s ease both; }
+    .member-card { animation: fadeUp .4s ease both; }
+    .member-card:nth-child(1) { animation-delay: .15s; }
+    .member-card:nth-child(2) { animation-delay: .2s;  }
+    .member-card:nth-child(3) { animation-delay: .25s; }
+    .member-card:nth-child(4) { animation-delay: .3s;  }
+    .member-card:nth-child(5) { animation-delay: .35s; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════ HEADER ══════════════════ -->
+  <header>
+    <div class="header-badge">Git &amp; GitHub Workshop</div>
+    <h1>Notre <span>Équipe</span></h1>
+    <p class="subtitle">
+      Bienvenue sur la page de notre équipe. Chaque membre a contribué à ce projet depuis sa propre branche Git.
+    </p>
+    <div class="branch-tag">main</div>
+  </header>
+
+  <!-- ══════════════════ MAIN ══════════════════ -->
+  <main>
+
+    <!-- Membres -->
+    <p class="section-label">Membres de l'équipe</p>
+
+    <div class="team-grid">
+
+      <!--
+        ╔══════════════════════════════════════════════╗
+        ║  RESPONSABLE — à modifier par le chef d'équipe  ║
+        ╚══════════════════════════════════════════════╝
+        Remplacer "Responsable" par le vrai prénom.
+        href pointe vers le fichier HTML du membre.
+      -->
+      <a href="responsable.html" class="member-card">
+        <div class="member-avatar">
+          <!--
+            Remplacer "responsable.jpg" par le vrai nom du fichier image.
+            Placer la photo dans le dossier du projet (même niveau que index.html).
+            Si l'image est absente, l'initiale "R" s'affiche en fallback.
+          -->
+          <img
+            src="responsable.jpg"
+            alt="Photo du Responsable"
+            onerror="this.style.display='none'"
+          />
+          R
+        </div>
+        <div class="member-name">Responsable</div>
+        <div class="member-role">Chef d'équipe · branch: main</div>
+        <div class="member-arrow">↗</div>
+      </a>
+
+      <!--
+        ╔══════════════════════════════════════════════╗
+        ║  MEMBRE 2 — chaque collaborateur ajoute      ║
+        ║  une carte comme celle-ci dans index.html    ║
+        ╚══════════════════════════════════════════════╝
+        Exemple :
+        <a href="prenom.html" class="member-card">
+          <div class="member-avatar">
+            <img
+              src="prenom.jpg"
+              alt="Photo de Prénom"
+              onerror="this.style.display='none'"
+            />
+            P
+          </div>
+          <div class="member-name">Prénom Nom</div>
+          <div class="member-role">Membre · branch: prenom</div>
+          <div class="member-arrow">↗</div>
+        </a>
+
+        ✅ Placer le fichier prenom.jpg à la racine du repo (même dossier qu'index.html).
+        ✅ Si l'image est introuvable, l'initiale s'affiche automatiquement en fallback.
+      -->
+
+      <!-- Placeholders : remplacés par les vrais membres -->
+      <a href="#" class="member-card placeholder">
+        <div class="member-avatar">?</div>
+        <div class="member-name">Membre 2</div>
+        <div class="member-role">En attente de contribution…</div>
+      </a>
+
+      <a href="#" class="member-card placeholder">
+        <div class="member-avatar">?</div>
+        <div class="member-name">Membre 3</div>
+        <div class="member-role">En attente de contribution…</div>
+      </a>
+
+      <a href="#" class="member-card placeholder">
+        <div class="member-avatar">?</div>
+        <div class="member-name">Membre 4</div>
+        <div class="member-role">En attente de contribution…</div>
+      </a>
+
+      <a href="#" class="member-card placeholder">
+        <div class="member-avatar">?</div>
+        <div class="member-name">Membre 5</div>
+        <div class="member-role">En attente de contribution…</div>
+      </a>
+
+    </div>
+
+    <!-- À propos -->
+    <p class="section-label">À propos du projet</p>
+
+    <div class="about-box">
+      <h2>Git Workshop — Travail collaboratif</h2>
+      <p>
+        Ce projet a été réalisé dans le cadre d'un atelier Git &amp; GitHub.
+        Chaque membre de l'équipe a créé sa propre branche, ajouté sa page personnelle,
+        puis le responsable a fusionné toutes les contributions sur la branche <code>main</code>.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- ══════════════════ FOOTER ══════════════════ -->
+  <footer>
+    <p>© 2025 — Git Workshop · Tous droits réservés</p>
+    <div class="git-badge">
+      <span>⎇</span> main &nbsp;·&nbsp; git merge --no-ff
+    </div>
+  </footer>
+
+</body>
+</html>
